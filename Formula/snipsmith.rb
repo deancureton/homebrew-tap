@@ -4,7 +4,7 @@ class Snipsmith < Formula
   desc "Manage LaTeX snippets for Obsidian, VS Code, and Neovim from one YAML file"
   homepage "https://github.com/deancureton/snipsmith"
   url "https://github.com/deancureton/snipsmith/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  sha256 "4b08a4f084635d72188166fe44b19a794fb24269ec06bcc3885641b621e005ca"
   license "MIT"
   head "https://github.com/deancureton/snipsmith.git", branch: "main"
 
