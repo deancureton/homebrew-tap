@@ -2,6 +2,7 @@ class TexMessages < Formula
   desc "IMessage client for macOS that renders LaTeX in your bubbles"
   homepage "https://github.com/deancureton/tex-messages"
   url "https://github.com/deancureton/tex-messages.git", tag: "v0.1.0"
+  license "MIT"
   head "https://github.com/deancureton/tex-messages.git", branch: "main"
 
   depends_on macos: :tahoe
