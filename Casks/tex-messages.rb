@@ -11,22 +11,31 @@ cask "tex-messages" do
 
   app "TeX Messages.app"
 
-  preflight do
-    source = staged_path/"tex-messages-#{version}"
-    system_command "/usr/bin/swift",
-                   args:         ["build", "--disable-sandbox", "-c", "release", "--package-path", source.to_s],
-                   print_stderr: false,
-                   must_succeed: true
-    contents = staged_path/"TeX Messages.app/Contents"
-    FileUtils.mkdir_p [contents/"MacOS", contents/"Resources"]
-    FileUtils.cp source/".build/release/TeXMessages", contents/"MacOS/TeXMessages"
-    (contents/"Resources/mathjax.js").binwrite((source/"Resources/mathjax.js").binread)
-    (contents/"Resources/AppIcon.icns").binwrite((source/"Resources/AppIcon.icns").binread)
-    (contents/"Info.plist").binwrite((source/"Resources/Info.plist").binread)
-    system_command "/usr/bin/codesign",
-                   args:         ["--force", "--deep", "--sign", "-", (staged_path/"TeX Messages.app").to_s],
-                   print_stderr: false,
-                   must_succeed: true
+  preflight_steps do
+    mkdir_p "{{temp}}/home", base: :temp
+    run "/usr/bin/swift",
+        args:         ["build", "--disable-sandbox", "-c", "release",
+                       "--package-path", "{{staged_path}}/tex-messages-{{version}}",
+                       "--cache-path", "{{temp}}/swiftpm-cache",
+                       "--config-path", "{{temp}}/swiftpm-config",
+                       "--security-path", "{{temp}}/swiftpm-security"],
+        env:          { "HOME" => "{{temp}}/home", "CLANG_MODULE_CACHE_PATH" => "{{temp}}/module-cache" },
+        print_stderr: false
+    mkdir_p "TeX Messages.app/Contents/MacOS"
+    mkdir_p "TeX Messages.app/Contents/Resources"
+    copy "tex-messages-{{version}}/.build/release/TeXMessages", "TeX Messages.app/Contents/MacOS/TeXMessages"
+    run "/bin/cat",
+        args:        ["{{staged_path}}/tex-messages-{{version}}/Resources/mathjax.js"],
+        stdout_path: "TeX Messages.app/Contents/Resources/mathjax.js"
+    run "/bin/cat",
+        args:        ["{{staged_path}}/tex-messages-{{version}}/Resources/AppIcon.icns"],
+        stdout_path: "TeX Messages.app/Contents/Resources/AppIcon.icns"
+    run "/bin/cat",
+        args:        ["{{staged_path}}/tex-messages-{{version}}/Resources/Info.plist"],
+        stdout_path: "TeX Messages.app/Contents/Info.plist"
+    run "/usr/bin/codesign",
+        args:         ["--force", "--deep", "--sign", "-", "{{staged_path}}/TeX Messages.app"],
+        print_stderr: false
   end
 
   zap trash: [
