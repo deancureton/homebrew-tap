@@ -13,18 +13,20 @@ cask "tex-messages" do
 
   preflight do
     source = staged_path/"tex-messages-#{version}"
-    system_command! "/usr/bin/swift",
-                    args:         ["build", "--disable-sandbox", "-c", "release", "--package-path", source.to_s],
-                    print_stderr: false
+    system_command "/usr/bin/swift",
+                   args:         ["build", "--disable-sandbox", "-c", "release", "--package-path", source.to_s],
+                   print_stderr: false,
+                   must_succeed: true
     contents = staged_path/"TeX Messages.app/Contents"
     FileUtils.mkdir_p [contents/"MacOS", contents/"Resources"]
     FileUtils.cp source/".build/release/TeXMessages", contents/"MacOS/TeXMessages"
     (contents/"Resources/mathjax.js").binwrite((source/"Resources/mathjax.js").binread)
     (contents/"Resources/AppIcon.icns").binwrite((source/"Resources/AppIcon.icns").binread)
     (contents/"Info.plist").binwrite((source/"Resources/Info.plist").binread)
-    system_command! "/usr/bin/codesign",
-                    args:         ["--force", "--deep", "--sign", "-", (staged_path/"TeX Messages.app").to_s],
-                    print_stderr: false
+    system_command "/usr/bin/codesign",
+                   args:         ["--force", "--deep", "--sign", "-", (staged_path/"TeX Messages.app").to_s],
+                   print_stderr: false,
+                   must_succeed: true
   end
 
   zap trash: [
